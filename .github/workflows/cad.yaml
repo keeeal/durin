@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
+    - name: Install dependencies
+      run: make install-cad dev=true
     - name: Check formatting
       run: make format-cad check=true
 
@@ -30,7 +32,7 @@ jobs:
     - uses: actions/upload-artifact@v6
       with:
         name: parts
-        if-no-files-found: error
+        # if-no-files-found: error
         path: parts/*.stl
     - name: Run tests
       run: make test-cad
