@@ -1,0 +1,3 @@
+main-assembly:
+  class: cad.main_assembly.MainAssembly
+  config: {}

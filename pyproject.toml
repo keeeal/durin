@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cad"
+version = "0.0.0"
+authors = [
+  { name="James Keal", email="james@keal.au" },
+]
+dependencies = [
+  "bd-vslot",
+  "build123d",
+]
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "isort",
+  "mypy",
+  "ocp_vscode",
+  "pytest",
+]

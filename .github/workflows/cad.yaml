@@ -1,0 +1,36 @@
+name: cad
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    paths:
+    - .github/workflows/cad.yaml
+    - src/cad/**/*
+    - Makefile
+
+jobs:
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Check formatting
+      run: make format-cad check=true
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Install dependencies
+      run: make install-cad dev=true
+    - name: Render parts
+      run: make stls
+    - uses: actions/upload-artifact@v6
+      with:
+        name: parts
+        if-no-files-found: error
+        path: parts/*.stl
+    - name: Run tests
+      run: make test-cad
