@@ -80,8 +80,7 @@ def export(
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument(
-        "--config",
-        dest="config_path",
+        "--config-path",
         type=Path,
         default=Path() / "src" / "cad" / "config.yaml",
     )
@@ -89,11 +88,11 @@ if __name__ == "__main__":
 
     parser_view = subparsers.add_parser("view", help="Visualize parts")
     parser_view.set_defaults(function=view)
-    parser_view.add_argument("--part", dest="part_name", default="main-assembly")
+    parser_view.add_argument("--part-name", default="main")
 
     parser_export = subparsers.add_parser("export", help="Export parts to file")
     parser_export.set_defaults(function=export)
-    parser_export.add_argument("--part", dest="part_name", default=None)
+    parser_export.add_argument("--part-name", default=None)
     parser_export.add_argument(
         "--format", type=str.lower, choices=EXPORT_FUNCTIONS, default="stl"
     )

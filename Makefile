@@ -13,7 +13,8 @@ install-cad:
 format: format-cad
 
 format-cad:
-	isort $(if $(check),--check,) . && black $(if $(check),--check,) .
+	isort $(if $(check),--check,) src/cad tests/cad && \
+	black $(if $(check),--check,) src/cad tests/cad
 
 test: test-cad
 
