@@ -9,7 +9,7 @@ authors = [
   { name="James Keal", email="james@keal.au" },
 ]
 dependencies = [
-  "bd-vslot",
+  "bd_warehouse",
   "build123d",
 ]
 
