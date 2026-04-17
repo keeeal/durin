@@ -10,7 +10,6 @@ frame:
 knob:
   class: cad.frame.Knob
   config: {}
-  export: true
 bed:
   class: cad.bed.BedAssembly
   config: {}
@@ -21,3 +20,58 @@ lead-screw:
 bed-bearing-mount:
   class: cad.bed.BedBearingMount
   config: {}
+linear-rail-block:
+  class: cad.x_axis.LinearRailBlock
+  config: {}
+gantry:
+  class: cad.gantry.GantryAssembly
+  config: {}
+thread-block:
+  class: cad.gantry.ThreadBlock
+  config: {}
+motor-bracket:
+  class: cad.gantry.MotorBracket
+  config: {}
+eg15-rail:
+  class: cad.x_axis.EG15LinearRail
+  config:
+    length: 100
+mgn15-bearing:
+  class: cad.gantry.MGN15LinearBearing
+  config:
+    variant: C
+mgn15-rail:
+  class: cad.gantry.MGN15LinearRail
+  config:
+    length: 100
+stepper-motor-plate:
+  class: cad.gantry.StepperMotorPlate
+  config: {}
+nut-block:
+  class: cad.gantry.NutBlock
+  config: {}
+spindle:
+  class: cad.spindle.SpindleAssembly
+  config: {}
+motor:
+  class: cad.spindle.Motor775
+  config:
+    simple: false
+motor-simple:
+  class: cad.spindle.Motor775
+  config:
+    simple: true
+gantry-plate:
+  class: cad.gantry.GantryPlate
+  config: {}
+back-plate:
+  class: cad.gantry.BackPlate
+  config: {}
+  export: true
+brass-nut:
+  class: cad.lead_screw.BrassNutSmall
+  config: {}
+front-plate:
+  class: cad.spindle.FrontPlate
+  config: {}
+  export: true

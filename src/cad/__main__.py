@@ -1,11 +1,12 @@
 from argparse import ArgumentParser
 from importlib import import_module
+from itertools import count
 from pathlib import Path
 from typing import Any, Callable
 
 from build123d import export_step, export_stl
 from build123d.topology.shape_core import Shape
-from ocp_vscode import show
+from ocp_vscode import save_screenshot, show
 from yaml import safe_load
 
 EXPORT_FUNCTIONS: dict[str, Callable[[Shape, Path], None]] = {
@@ -42,10 +43,20 @@ def build_part(
 def view(
     config_path: Path,
     part_name: str,
+    screenshot: bool = False,
 ) -> None:
     config = load_config(config_path)
     part = build_part(config, part_name)
     show(part)
+    if screenshot:
+        output_dir = Path() / "screenshots"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        for index in count():
+            output_path = output_dir / f"{part_name}_{index:04d}.png"
+            if not output_path.exists():
+                break
+        save_screenshot(output_path.as_posix())
+        print(f"Saved screenshot to {output_path}")
 
 
 def export(
@@ -89,6 +100,7 @@ if __name__ == "__main__":
     parser_view = subparsers.add_parser("view", help="Visualize parts")
     parser_view.set_defaults(function=view)
     parser_view.add_argument("--part-name", default="main")
+    parser_view.add_argument("--screenshot", action="store_true")
 
     parser_export = subparsers.add_parser("export", help="Export parts to file")
     parser_export.set_defaults(function=export)

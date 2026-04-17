@@ -1,11 +1,15 @@
+from copy import copy
+
 from bd_warehouse.bearing import SingleRowCappedDeepGrooveBallBearing
 from bd_warehouse.open_builds import StepperMotor, VSlotLinearRail
 from build123d import *
 from build123d.topology.shape_core import Shape
 
-from cad.hardware import LeadScrew
+from cad.gantry import GantryAssembly
+from cad.lead_screw import LeadScrew
+from cad.linear_rail import EG15LinearRail
 from cad.utils.color import unset_color
-from cad.utils.env import SIMPLE
+from cad.utils.env import SIMPLE, X
 
 
 class SidePlate(BasePartObject):
@@ -115,55 +119,6 @@ class RightPlate(BasePartObject):
         super().__init__(main.part, rotation=rotation, align=align, mode=mode)
 
 
-class LinearRail(BasePartObject):
-    def __init__(
-        self,
-        length: float,
-        *,
-        rotation: RotationLike = (0, 0, 0),
-        align: Align | tuple[Align, Align, Align] | None = None,
-        mode: Mode = Mode.ADD,
-    ) -> None:
-        with BuildPart() as main:
-            with BuildSketch():
-                with BuildLine():
-                    Polyline(
-                        (0, 0),
-                        (7.5, 0),
-                        (7.5, 2.5),
-                        (5.5, 4.5),
-                        (5.5, 7.5),
-                        (7.5, 7.5),
-                        (7.5, 12.5),
-                        (0, 12.5),
-                    )
-                    mirror(about=Plane.YZ)
-                make_face()
-                with Locations((0, 10)):
-                    with GridLocations(
-                        x_spacing=15,
-                        y_spacing=5,
-                        x_count=2,
-                        y_count=2,
-                    ):
-                        Circle(1.25, mode=Mode.SUBTRACT)
-            extrude(amount=length)
-            chamfer(main.edges().filter_by(Plane.XY), length=1.0)
-            with BuildSketch(Plane.XZ):
-                with Locations((0, length / 2)):
-                    with GridLocations(
-                        x_spacing=0,
-                        y_spacing=60,
-                        x_count=1,
-                        y_count=(length - 20) // 60 + 1,
-                    ):
-                        Circle(3.75)
-            extrude(until=Until.FIRST, mode=Mode.SUBTRACT)
-            chamfer(main.edges(Select.LAST).group_by(Axis.Y)[-1], length=0.5)
-
-        super().__init__(main.part, rotation=rotation, align=align, mode=mode)
-
-
 class XAxisAssembly(Compound):
     def __init__(
         self,
@@ -191,13 +146,10 @@ class XAxisAssembly(Compound):
         right_plate.label = "right-plate"
         children.append(right_plate)
 
+        rail = VSlotLinearRail("20x20", length=370, align=Align.CENTER)
         rails = [
-            VSlotLinearRail("20x20", length=370, align=Align.CENTER).move(
-                Location((0, 71, 210), (0, 90, 0)),
-            ),
-            VSlotLinearRail("20x20", length=370, align=Align.CENTER).move(
-                Location((0, 71, 140), (0, 90, 0)),
-            ),
+            copy(rail).move(Location((0, 71, 210), (0, 90, 0))),
+            copy(rail).move(Location((0, 71, 140), (0, 90, 0))),
         ]
         for index, rail in enumerate(rails):
             unset_color(rail)
@@ -236,17 +188,22 @@ class XAxisAssembly(Compound):
         lead_screw.label = "lead-screw"
         children.append(lead_screw)
 
+        linear_rail = EG15LinearRail(
+            length=330, align=(Align.CENTER, Align.MIN, Align.CENTER)
+        )
         linear_rails = [
-            LinearRail(length=330, align=(Align.CENTER, Align.MIN, Align.CENTER)).move(
-                Location((0, 61, 210), (0, 90, 180)),
-            ),
-            LinearRail(length=330, align=(Align.CENTER, Align.MIN, Align.CENTER)).move(
-                Location((0, 61, 140), (0, 90, 180)),
-            ),
+            copy(linear_rail).move(Location((0, 61, 210), (0, 90, 180))),
+            copy(linear_rail).move(Location((0, 61, 140), (0, 90, 180))),
         ]
         for index, linear_rail in enumerate(linear_rails):
             linear_rail.label = f"linear-rail-{index}"
         children.extend(linear_rails)
+
+        gantry = GantryAssembly().move(
+            Location((X, 56.75, 0), (0, 0, 0)),
+        )
+        gantry.label = "gantry"
+        children.append(gantry)
 
         super().__init__(
             label=label,

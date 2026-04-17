@@ -3,6 +3,7 @@ from build123d.topology.shape_core import Shape
 
 from cad.bed import BedAssembly
 from cad.frame import FrameAssembly
+from cad.utils.env import Y
 from cad.x_axis import XAxisAssembly
 
 
@@ -20,10 +21,10 @@ class MainAssembly(Compound):
         frame = FrameAssembly(label="frame")
         children.append(frame)
 
-        x_axis = XAxisAssembly(label="x-axis").move(Location((0, -150, 0), (0, 0, 0)))
+        x_axis = XAxisAssembly(label="x-axis").move(Location((0, -150, 0)))
         children.append(x_axis)
 
-        bed = BedAssembly(label="bed").move(Location((0, -200, 46), (0, 0, 0)))
+        bed = BedAssembly(label="bed").move(Location((0, Y - 150, 46)))
         children.append(bed)
 
         super().__init__(

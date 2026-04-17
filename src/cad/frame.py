@@ -1,4 +1,5 @@
 from copy import copy
+from itertools import product
 
 from bd_warehouse.bearing import SingleRowCappedDeepGrooveBallBearing
 from bd_warehouse.fastener import SocketHeadCapScrew
@@ -6,7 +7,7 @@ from bd_warehouse.open_builds import StepperMotor, VSlotLinearRail
 from build123d import *
 from build123d.topology.shape_core import Shape
 
-from cad.hardware import LeadScrew
+from cad.lead_screw import LeadScrew
 from cad.utils.color import unset_color
 from cad.utils.env import SIMPLE
 from cad.utils.math import float_range, polar_to_cartesian
@@ -135,6 +136,78 @@ class Knob(BasePartObject):
         super().__init__(main.part, rotation=rotation, align=align, mode=mode)
 
 
+class EndStop(BasePartObject):
+    def __init__(
+        self,
+        *,
+        rotation: RotationLike = (0, 0, 0),
+        align: Align | tuple[Align, Align, Align] | None = None,
+        mode: Mode = Mode.ADD,
+    ) -> None:
+        with BuildPart() as main:
+            with BuildSketch(Plane.XZ):
+                with Locations((5, 0)):
+                    Rectangle(7.5, 1, align=Align.MIN)
+                with Locations((6, 7)):
+                    Circle(1)
+                with Locations((9, 5)):
+                    Circle(3)
+                make_hull()
+                with Locations((2, 0)):
+                    Rectangle(10, 4, align=Align.MIN)
+            revolve()
+
+        super().__init__(main.part, rotation=rotation, align=align, mode=mode)
+
+
+class CornerBracket(BasePartObject):
+    def __init__(
+        self,
+        *,
+        rotation: RotationLike = (0, 0, 0),
+        align: Align | tuple[Align, Align, Align] | None = None,
+        mode: Mode = Mode.ADD,
+    ) -> None:
+        with BuildPart() as main:
+            Box(20, 5, 20)
+            chamfer(main.edges(), length=0.5)
+
+        super().__init__(main.part, rotation=rotation, align=align, mode=mode)
+
+
+class JoiningPlate(BasePartObject):
+    def __init__(
+        self,
+        *,
+        rotation: RotationLike = (0, 0, 0),
+        align: Align | tuple[Align, Align, Align] | None = None,
+        mode: Mode = Mode.ADD,
+    ) -> None:
+        with BuildPart() as main:
+            with BuildSketch():
+                with BuildLine():
+                    Polyline(
+                        (0, 0),
+                        (60, 0),
+                        (60, 20),
+                        (20, 60),
+                        (0, 60),
+                        close=True,
+                    )
+                make_face()
+                with Locations(
+                    *(
+                        (20 * i + 10, 20 * j + 10)
+                        for i, j in product(range(3), range(3))
+                        if i == 0 or j == 0
+                    )
+                ):
+                    Circle(2.5, mode=Mode.SUBTRACT)
+            extrude(amount=4)
+
+        super().__init__(main.part, rotation=rotation, align=align, mode=mode)
+
+
 class FrameAssembly(Compound):
     def __init__(
         self,
@@ -164,6 +237,15 @@ class FrameAssembly(Compound):
             ),
             VSlotLinearRail("20x40", length=290).move(
                 Location((+195, -275, 0), (0, 0, 0)),
+            ),
+            VSlotLinearRail("20x20", length=290).move(
+                Location((-195, -5, 300), (90, 0, 0)),
+            ),
+            VSlotLinearRail("20x20", length=290).move(
+                Location((+195, -5, 300), (90, 0, 0)),
+            ),
+            VSlotLinearRail("20x20", length=370, align=Align.CENTER).move(
+                Location((0, -10, 300), (0, 90, 0)),
             ),
         ]
         for index, rail in enumerate(rails):
@@ -248,6 +330,35 @@ class FrameAssembly(Compound):
         )
         knob.label = "knob"
         children.append(knob)
+
+        foot = EndStop()
+        feet = [
+            copy(foot).move(Location((-195, -10, 0), (180, 0, 0))),
+            copy(foot).move(Location((+195, -10, 0), (180, 0, 0))),
+            copy(foot).move(Location((-195, -265, 0), (180, 0, 0))),
+            copy(foot).move(Location((+195, -265, 0), (180, 0, 0))),
+        ]
+        for index, foot in enumerate(feet):
+            foot.label = f"foot-{index}"
+        children.extend(feet)
+
+        corner_bracket = CornerBracket()
+        corner_brackets = [
+            copy(corner_bracket).move(Location((-195, -2.5, 300))),
+            copy(corner_bracket).move(Location((+195, -2.5, 300))),
+        ]
+        for index, corner_bracket in enumerate(corner_brackets):
+            corner_bracket.label = f"corner-bracket-{index}"
+        children.extend(corner_brackets)
+
+        joining_plate = JoiningPlate()
+        joining_plates = [
+            copy(joining_plate).move(Location((-205, -295, 310), (0, -90, 90))),
+            copy(joining_plate).move(Location((+205, -295, 310), (0, 90, 0))),
+        ]
+        for index, joining_plate in enumerate(joining_plates):
+            joining_plate.label = f"joining-plate-{index}"
+        children.extend(joining_plates)
 
         super().__init__(
             label=label,

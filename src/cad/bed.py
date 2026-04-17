@@ -1,7 +1,10 @@
+from copy import copy
+
 from build123d import *
 from build123d.topology.shape_core import Shape
 
-from cad.utils.math import polar_to_cartesian
+from cad.bearing import CustomCappedBearing
+from cad.utils.color import unset_color
 
 
 class Bed(BasePartObject):
@@ -162,23 +165,36 @@ class BedAssembly(Compound):
         bed.label = "bed"
         children.append(bed)
 
+        bearing_mount = BedBearingMount(align=(Align.CENTER, Align.CENTER, Align.MAX))
         bearing_mounts = [
-            BedBearingMount(align=(Align.CENTER, Align.CENTER, Align.MAX)).move(
-                Location((-100, -40, 0)),
-            ),
-            BedBearingMount(align=(Align.CENTER, Align.CENTER, Align.MAX)).move(
-                Location((+100, -40, 0)),
-            ),
-            BedBearingMount(align=(Align.CENTER, Align.CENTER, Align.MAX)).move(
-                Location((-100, +40, 0)),
-            ),
-            BedBearingMount(align=(Align.CENTER, Align.CENTER, Align.MAX)).move(
-                Location((+100, +40, 0)),
-            ),
+            copy(bearing_mount).move(Location((-100, -40, 0))),
+            copy(bearing_mount).move(Location((+100, -40, 0))),
+            copy(bearing_mount).move(Location((-100, +40, 0))),
+            copy(bearing_mount).move(Location((+100, +40, 0))),
         ]
         for index, mount in enumerate(bearing_mounts):
             mount.label = f"bearing-mount-{index}"
         children.extend(bearing_mounts)
+
+        large_bearing = CustomCappedBearing(
+            inner_diameter=10,
+            outer_diameter=19,
+            thickness=5,
+        )
+        bearings = [
+            copy(large_bearing).move(Location((-100, -50, -22), (90, 0, 0))),
+            copy(large_bearing).move(Location((-100, -25, -22), (90, 0, 0))),
+            copy(large_bearing).move(Location((+100, -50, -22), (90, 0, 0))),
+            copy(large_bearing).move(Location((+100, -25, -22), (90, 0, 0))),
+            copy(large_bearing).move(Location((-100, +50, -22), (-90, 0, 0))),
+            copy(large_bearing).move(Location((-100, +25, -22), (-90, 0, 0))),
+            copy(large_bearing).move(Location((+100, +50, -22), (-90, 0, 0))),
+            copy(large_bearing).move(Location((+100, +25, -22), (-90, 0, 0))),
+        ]
+        for index, bearing in enumerate(bearings):
+            unset_color(bearing)
+            bearing.label = f"bearing-{index}"
+        children.extend(bearings)
 
         thread_mount = BedThreadMount(align=(Align.CENTER, Align.CENTER, Align.MAX))
         thread_mount.label = "thread-mount"

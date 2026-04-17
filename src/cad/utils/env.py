@@ -12,4 +12,18 @@ def getbool(key: str, default: bool = False) -> bool:
     return default
 
 
-SIMPLE = getbool("SIMPLE")
+def getfloat(key: str, default: float = 0.0) -> float:
+    value = getenv(key)
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
+SIMPLE = getbool("SIMPLE", True)
+
+X = getfloat("X")
+Y = getfloat("Y")
+Z = getfloat("Z")
