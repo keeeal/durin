@@ -37,9 +37,9 @@ eg15-rail:
   config:
     length: 100
 mgn15-bearing:
-  class: cad.gantry.MGN15LinearBearing
+  class: cad.linear_rail.MGN15LinearBearing
   config:
-    variant: C
+    variant: H
 mgn15-rail:
   class: cad.gantry.MGN15LinearRail
   config:
@@ -56,7 +56,7 @@ spindle:
 motor:
   class: cad.spindle.Motor775
   config:
-    simple: false
+    simple: true
 motor-simple:
   class: cad.spindle.Motor775
   config:

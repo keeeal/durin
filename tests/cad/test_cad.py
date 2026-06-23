@@ -1,2 +1,2 @@
-def test_cad():
-    assert "works on my machine"
+def test_cad() -> None:
+    assert "works on my machine"  # noqa: PLW0129

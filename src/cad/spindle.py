@@ -1,5 +1,3 @@
-from typing import Literal
-
 from build123d import *
 from build123d.topology.shape_core import Shape
 
@@ -19,14 +17,16 @@ class SpindleMotorBracket(BasePartObject):
         with BuildPart() as main:
             with BuildSketch() as profile:
                 Rectangle(50, 52, align=(Align.CENTER, Align.MIN))
-                with Locations((0, 26)):
-                    with GridLocations(
+                with (
+                    Locations((0, 26)),
+                    GridLocations(
                         x_spacing=23,
                         y_spacing=28,
                         x_count=2,
                         y_count=2,
-                    ):
-                        SlotOverall(10, 4, mode=Mode.SUBTRACT)
+                    ),
+                ):
+                    SlotOverall(10, 4, mode=Mode.SUBTRACT)
                 fillet(profile.vertices().group_by(Axis.Y)[-1], radius=5)
             extrude(amount=3)
             with BuildSketch(Plane.XZ) as profile:
@@ -118,8 +118,8 @@ class FrontPlate(BasePartObject):
 class Motor775(BasePartObject):
     def __init__(
         self,
-        simple: bool = False,
         *,
+        simple: bool = False,
         rotation: RotationLike = (0, 0, 0),
         align: Align | tuple[Align, Align, Align] | None = None,
         mode: Mode = Mode.ADD,
@@ -151,8 +151,8 @@ class Motor775(BasePartObject):
             else:
                 add(
                     import_step("src/cad/assets/motor-775.step").move(
-                        Location((0, 0, -20.5), (0, 90, 180))
-                    )
+                        Location((0, 0, -20.5), (0, 90, 180)),
+                    ),
                 )
         super().__init__(main.part, rotation=rotation, align=align, mode=mode)
 
@@ -165,7 +165,7 @@ class SpindleAssembly(Compound):
         color: Color | None = None,
         material: str = "",
         parent: Compound | None = None,
-    ):
+    ) -> None:
         children: list[Shape] = []
 
         spindle_motor_bracket = SpindleMotorBracket().move(

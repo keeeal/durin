@@ -7,7 +7,7 @@ class CustomCappedBearing(SingleRowCappedDeepGrooveBallBearing):
         inner_diameter: float,
         outer_diameter: float,
         thickness: float,
-    ):
+    ) -> None:
         delta = outer_diameter - inner_diameter
         self.bearing_data = {
             "M": {
@@ -17,6 +17,6 @@ class CustomCappedBearing(SingleRowCappedDeepGrooveBallBearing):
                 "SKT:d1": str(inner_diameter + delta / 4),
                 "SKT:D1": str(outer_diameter - delta / 4),
                 "SKT:r12": str(delta / 64),
-            }
+            },
         }
         super().__init__("M")

@@ -1,12 +1,15 @@
-# editors
+# Editors
 .vscode/
 
-# python byte-compiled / optimized / dll files
+# UV
+uv.lock
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
 *$py.class
 
-# python distribution / packaging
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -26,7 +29,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# python unit test / coverage reports
+# Unit test / coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -37,6 +40,7 @@ nosetests.xml
 coverage.xml
 *.cover
 *.py.cover
+*.lcov
 .hypothesis/
 .pytest_cache/
 cover/

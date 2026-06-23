@@ -52,13 +52,11 @@ class FrontPlate(BasePartObject):
     ) -> None:
         with BuildPart() as main:
             BasePlate(align=Align.CENTER)
-            with BuildSketch():
-                with Locations((0, 1.5)):
-                    Circle(4.5)
+            with BuildSketch(), Locations((0, 1.5)):
+                Circle(4.5)
             extrude(until=Until.FIRST, mode=Mode.SUBTRACT)
-            with BuildSketch():
-                with Locations((0, 1.5)):
-                    Circle(8)
+            with BuildSketch(), Locations((0, 1.5)):
+                Circle(8)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
             chamfer(main.edges(Select.LAST).group_by(Axis.Z)[-1], length=0.5)
 
@@ -75,16 +73,15 @@ class BackPlate(BasePartObject):
     ) -> None:
         with BuildPart() as main:
             BasePlate()
-            with BuildSketch():
-                with Locations((0, 1.5)):
-                    Circle(12)
-                    with GridLocations(
-                        x_spacing=31,
-                        y_spacing=31,
-                        x_count=2,
-                        y_count=2,
-                    ):
-                        Circle(2)
+            with BuildSketch(), Locations((0, 1.5)):
+                Circle(12)
+                with GridLocations(
+                    x_spacing=31,
+                    y_spacing=31,
+                    x_count=2,
+                    y_count=2,
+                ):
+                    Circle(2)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
             chamfer(main.edges(Select.LAST).group_by(Axis.Z)[-1], length=0.5)
 
@@ -105,13 +102,13 @@ class Knob(BasePartObject):
         with BuildPart() as main:
             Cylinder(outer_radius, 10, align=(Align.CENTER, Align.CENTER, Align.MIN))
             chamfer(main.edges(), length=0.5)
-            with BuildSketch() as profile:
+            with BuildSketch():
                 with BuildLine():
                     Polyline(
                         *(
                             polar_to_cartesian(outer_radius - 0.25 * (index % 2), angle)
                             for index, angle in enumerate(
-                                float_range(0, 360, 180 / num_points)
+                                float_range(0, 360, 180 / num_points),
                             )
                         ),
                         close=True,
@@ -127,9 +124,8 @@ class Knob(BasePartObject):
                     mode=Mode.SUBTRACT,
                 )
             chamfer(main.edges().group_by(Axis.Z)[-1], length=0.5)
-            with BuildSketch(Plane.YZ):
-                with Locations((0, 13)):
-                    Circle(2)
+            with BuildSketch(Plane.YZ), Locations((0, 13)):
+                Circle(2)
             extrude(until=Until.FIRST, mode=Mode.SUBTRACT)
             chamfer(main.edges(Select.LAST), length=0.5)
 
@@ -200,7 +196,7 @@ class JoiningPlate(BasePartObject):
                         (20 * i + 10, 20 * j + 10)
                         for i, j in product(range(3), range(3))
                         if i == 0 or j == 0
-                    )
+                    ),
                 ):
                     Circle(2.5, mode=Mode.SUBTRACT)
             extrude(amount=4)
@@ -216,7 +212,7 @@ class FrameAssembly(Compound):
         color: Color | None = None,
         material: str = "",
         parent: Compound | None = None,
-    ):
+    ) -> None:
         children: list[Shape] = []
 
         rails = [
@@ -322,7 +318,7 @@ class FrameAssembly(Compound):
             Location((0, -300, 24), (90, 0, 0)),
         )
         unset_color(bearing)
-        bearing.label = f"bearing"
+        bearing.label = "bearing"
         children.append(bearing)
 
         knob = Knob(align=(Align.CENTER, Align.CENTER, Align.MAX)).move(

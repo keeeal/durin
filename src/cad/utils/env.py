@@ -1,7 +1,7 @@
 from os import getenv
 
 
-def getbool(key: str, default: bool = False) -> bool:
+def getbool(key: str, *, default: bool = False) -> bool:
     value = getenv(key)
     if value is None:
         return default
@@ -12,7 +12,7 @@ def getbool(key: str, default: bool = False) -> bool:
     return default
 
 
-def getfloat(key: str, default: float = 0.0) -> float:
+def getfloat(key: str, *, default: float = 0.0) -> float:
     value = getenv(key)
     if value is None:
         return default
@@ -22,7 +22,7 @@ def getfloat(key: str, default: float = 0.0) -> float:
         return default
 
 
-SIMPLE = getbool("SIMPLE", True)
+SIMPLE = getbool("SIMPLE", default=True)
 
 X = getfloat("X")
 Y = getfloat("Y")

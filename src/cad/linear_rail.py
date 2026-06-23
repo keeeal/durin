@@ -27,25 +27,26 @@ class EG15LinearRail(BasePartObject):
                     )
                     mirror(about=Plane.YZ)
                 make_face()
-                with Locations((0, 10)):
-                    with GridLocations(
+                with (
+                    Locations((0, 10)),
+                    GridLocations(
                         x_spacing=15,
                         y_spacing=5,
                         x_count=2,
                         y_count=2,
-                    ):
-                        Circle(1.25, mode=Mode.SUBTRACT)
+                    ),
+                ):
+                    Circle(1.25, mode=Mode.SUBTRACT)
             extrude(amount=length)
             chamfer(main.edges().filter_by(Plane.XY), length=1.0)
-            with BuildSketch(Plane.XZ):
-                with Locations((0, length / 2)):
-                    with GridLocations(
-                        x_spacing=0,
-                        y_spacing=60,
-                        x_count=1,
-                        y_count=(length - 20) // 60 + 1,
-                    ):
-                        Circle(3.75)
+            with BuildSketch(Plane.XZ), Locations((0, length / 2)):
+                with GridLocations(
+                    x_spacing=0,
+                    y_spacing=60,
+                    x_count=1,
+                    y_count=(length - 20) // 60 + 1,
+                ):
+                    Circle(3.75)
             extrude(until=Until.FIRST, mode=Mode.SUBTRACT)
             chamfer(main.edges(Select.LAST).group_by(Axis.Y)[-1], length=0.5)
 
@@ -59,7 +60,7 @@ class EG15LinearBearing(BasePartObject):
         rotation: RotationLike = (0, 0, 0),
         align: Align | tuple[Align, Align, Align] | None = None,
         mode: Mode = Mode.ADD,
-    ):
+    ) -> None:
         with BuildSketch() as hole:
             with BuildLine():
                 Polyline(
@@ -125,25 +126,23 @@ class MGN15LinearRail(BasePartObject):
                     Circle(1.25, mode=Mode.SUBTRACT)
             extrude(amount=length)
             chamfer(main.edges().filter_by(Plane.XY), length=1.0)
-            with BuildSketch(Plane.XZ):
-                with Locations((0, length / 2)):
-                    with GridLocations(
-                        x_spacing=0,
-                        y_spacing=40,
-                        x_count=1,
-                        y_count=(length - 20) // 40 + 1,
-                    ):
-                        Circle(1.75)
+            with BuildSketch(Plane.XZ), Locations((0, length / 2)):
+                with GridLocations(
+                    x_spacing=0,
+                    y_spacing=40,
+                    x_count=1,
+                    y_count=(length - 20) // 40 + 1,
+                ):
+                    Circle(1.75)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
-            with BuildSketch(Plane.XZ):
-                with Locations((0, length / 2)):
-                    with GridLocations(
-                        x_spacing=0,
-                        y_spacing=40,
-                        x_count=1,
-                        y_count=(length - 20) // 40 + 1,
-                    ):
-                        Circle(3)
+            with BuildSketch(Plane.XZ), Locations((0, length / 2)):
+                with GridLocations(
+                    x_spacing=0,
+                    y_spacing=40,
+                    x_count=1,
+                    y_count=(length - 20) // 40 + 1,
+                ):
+                    Circle(3)
             extrude(until=Until.FIRST, mode=Mode.SUBTRACT)
             chamfer(main.edges(Select.LAST).group_by(Axis.Y)[-1], length=0.5)
 
@@ -158,7 +157,7 @@ class MGN15LinearBearing(BasePartObject):
         rotation: RotationLike = (0, 0, 0),
         align: Align | tuple[Align, Align, Align] | None = None,
         mode: Mode = Mode.ADD,
-    ):
+    ) -> None:
         with BuildSketch() as profile:
             Rectangle(31.5, 11.75, align=(Align.CENTER, Align.MIN))
             chamfer(profile.vertices(), length=1.0)

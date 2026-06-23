@@ -25,13 +25,11 @@ class ThreadBlock(BasePartObject):
                 Rectangle(33.25, 13, align=(Align.MAX, Align.MIN))
                 Rectangle(32, 50, align=(Align.CENTER, Align.MIN))
             extrude(amount=11.5, both=True)
-            with BuildSketch(Plane.XZ):
-                with Locations((-23, 0), (+23, 0)):
-                    Circle(3)
+            with BuildSketch(Plane.XZ), Locations((-23, 0), (+23, 0)):
+                Circle(3)
             extrude(until=Until.FIRST, mode=Mode.SUBTRACT)
-            with BuildSketch(Plane.YZ):
-                with Locations((34.5, 0)):
-                    Circle(5)
+            with BuildSketch(Plane.YZ), Locations((34.5, 0)):
+                Circle(5)
             extrude(until=Until.LAST, both=True, mode=Mode.SUBTRACT)
             chamfer(main.edges(), length=0.5)
 
@@ -57,14 +55,16 @@ class BackPlate(BasePartObject):
                         y_count=4,
                     ):
                         Circle(1.75, mode=Mode.SUBTRACT)
-                with Locations((0, -35), (0, +35)):
-                    with GridLocations(
+                with (
+                    Locations((0, -35), (0, +35)),
+                    GridLocations(
                         x_spacing=26,
                         y_spacing=26,
                         x_count=2,
                         y_count=2,
-                    ):
-                        Circle(2.25, mode=Mode.SUBTRACT)
+                    ),
+                ):
+                    Circle(2.25, mode=Mode.SUBTRACT)
                 with Locations((-23, 1), (+23, 1)):
                     SlotOverall(9, 5.5, rotation=90, mode=Mode.SUBTRACT)
             extrude(amount=3)
@@ -108,14 +108,16 @@ class StepperMotorBracket(BasePartObject):
         with BuildPart() as main:
             with BuildSketch() as profile:
                 Rectangle(50, 53, align=(Align.CENTER, Align.MIN))
-                with Locations((0, 27)):
-                    with GridLocations(
+                with (
+                    Locations((0, 27)),
+                    GridLocations(
                         x_spacing=30,
                         y_spacing=0,
                         x_count=2,
                         y_count=1,
-                    ):
-                        SlotOverall(34, 4, rotation=90, mode=Mode.SUBTRACT)
+                    ),
+                ):
+                    SlotOverall(34, 4, rotation=90, mode=Mode.SUBTRACT)
                 chamfer(profile.vertices().group_by(Axis.Y)[-1], length=5)
             extrude(amount=3)
             with BuildSketch(Plane.XZ) as profile:
@@ -155,14 +157,16 @@ class StepperMotorPlate(BasePartObject):
                         Location((+14.25, +14.25), 45),
                     ):
                         SlotOverall(6.65, 3.1, mode=Mode.SUBTRACT)
-                with Locations((0, 63.8)):
-                    with GridLocations(
+                with (
+                    Locations((0, 63.8)),
+                    GridLocations(
                         x_spacing=10,
                         y_spacing=20,
                         x_count=3,
                         y_count=2,
-                    ):
-                        Circle(2.5, mode=Mode.SUBTRACT)
+                    ),
+                ):
+                    Circle(2.5, mode=Mode.SUBTRACT)
             extrude(amount=3)
 
         super().__init__(main.part, rotation=rotation, align=align, mode=mode)
@@ -176,7 +180,7 @@ class GantryAssembly(Compound):
         color: Color | None = None,
         material: str = "",
         parent: Compound | None = None,
-    ):
+    ) -> None:
         children: list[Shape] = []
 
         eg15_bearing = EG15LinearBearing()
@@ -213,7 +217,7 @@ class GantryAssembly(Compound):
         # children.append(stepper_motor_plate)
 
         stepper_motor = StepperMotor("Nema17").move(
-            Location((0, -34, 250), (180, 0, 0))
+            Location((0, -34, 250), (180, 0, 0)),
         )
         unset_color(stepper_motor)
         stepper_motor.label = "stepper-motor"
@@ -233,12 +237,14 @@ class GantryAssembly(Compound):
 
         mgn15_rails = [
             MGN15LinearRail(
-                length=150, align=(Align.CENTER, Align.MIN, Align.CENTER)
+                length=150,
+                align=(Align.CENTER, Align.MIN, Align.CENTER),
             ).move(
                 Location((-35, -23.25, 198), 180),
             ),
             MGN15LinearRail(
-                length=150, align=(Align.CENTER, Align.MIN, Align.CENTER)
+                length=150,
+                align=(Align.CENTER, Align.MIN, Align.CENTER),
             ).move(
                 Location((+35, -23.25, 198), 180),
             ),

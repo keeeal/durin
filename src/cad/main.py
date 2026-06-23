@@ -15,7 +15,7 @@ class MainAssembly(Compound):
         color: Color | None = None,
         material: str = "",
         parent: Compound | None = None,
-    ):
+    ) -> None:
         children: list[Shape] = []
 
         frame = FrameAssembly(label="frame")

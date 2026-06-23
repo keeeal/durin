@@ -64,9 +64,8 @@ class AntiBacklashNutBlock(BasePartObject):
                 with Locations((-10, -6.5), (+10, -6.5)):
                     Circle(2.5, mode=Mode.SUBTRACT)
             extrude(amount=6, both=True)
-            with BuildSketch():
-                with Locations((-10, -6.5), (+10, -6.5)):
-                    RegularPolygon(4, 6, major_radius=False, rotation=30)
+            with BuildSketch(), Locations((-10, -6.5), (+10, -6.5)):
+                RegularPolygon(4, 6, major_radius=False, rotation=30)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
             with BuildSketch(Plane.XY.move(Location((0, 0, -4)))):
                 with Locations((-10, -6.5), (+10, -6.5)):

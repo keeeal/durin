@@ -16,7 +16,7 @@ class Bed(BasePartObject):
         rotation: RotationLike = (0, 0, 0),
         align: Align | tuple[Align, Align, Align] | None = None,
         mode: Mode = Mode.ADD,
-    ):
+    ) -> None:
         with BuildSketch() as slot:
             with BuildLine():
                 Polyline(
@@ -62,7 +62,7 @@ class Bed(BasePartObject):
                     *(
                         Location((22.5 * index, 15 * (index % 2)), angle=180 * index)
                         for index in range(1, num_slots + 1)
-                    )
+                    ),
                 ):
                     add(slot, mode=Mode.SUBTRACT)
                 index = num_slots + 1
@@ -84,7 +84,7 @@ class BedBearingMount(BasePartObject):
         rotation: RotationLike = (0, 0, 0),
         align: Align | tuple[Align, Align, Align] | None = None,
         mode: Mode = Mode.ADD,
-    ):
+    ) -> None:
         with BuildPart() as main:
             with BuildSketch(Plane.XZ) as profile:
                 RegularPolygon(radius=14, side_count=10)
@@ -95,14 +95,16 @@ class BedBearingMount(BasePartObject):
                 Circle(9.5, mode=Mode.SUBTRACT)
                 fillet(profile.vertices().group_by(Axis.Y)[:-2], radius=1.0)
             extrude(amount=15, both=True)
-            with BuildSketch():
-                with GridLocations(
+            with (
+                BuildSketch(),
+                GridLocations(
                     x_spacing=38,
                     y_spacing=10,
                     x_count=2,
                     y_count=2,
-                ):
-                    Circle(2.75)
+                ),
+            ):
+                Circle(2.75)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
 
         super().__init__(main.part, rotation=rotation, align=align, mode=mode)
@@ -115,7 +117,7 @@ class BedThreadMount(BasePartObject):
         rotation: RotationLike = (0, 0, 0),
         align: Align | tuple[Align, Align, Align] | None = None,
         mode: Mode = Mode.ADD,
-    ):
+    ) -> None:
         with BuildPart() as main:
             with BuildSketch(Plane.XZ) as profile:
                 RegularPolygon(radius=11, side_count=10)
@@ -126,18 +128,19 @@ class BedThreadMount(BasePartObject):
                 Circle(4.25, mode=Mode.SUBTRACT)
                 fillet(profile.vertices().group_by(Axis.Y)[:-2], radius=1.0)
             extrude(amount=15, both=True)
-            with BuildSketch():
-                with GridLocations(
+            with (
+                BuildSketch(),
+                GridLocations(
                     x_spacing=33,
                     y_spacing=10,
                     x_count=2,
                     y_count=3,
-                ):
-                    Circle(2.75)
+                ),
+            ):
+                Circle(2.75)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
-            with BuildSketch():
-                with Locations((0, -15)):
-                    Rectangle(10, 10)
+            with BuildSketch(), Locations((0, -15)):
+                Rectangle(10, 10)
             extrude(amount=12, both=True, mode=Mode.SUBTRACT)
             with BuildSketch(Plane.XY.move(Location((0, 0, 22)))):
                 with Locations((0, -12.5)):
@@ -158,7 +161,7 @@ class BedAssembly(Compound):
         color: Color | None = None,
         material: str = "",
         parent: Compound | None = None,
-    ):
+    ) -> None:
         children: list[Shape] = []
 
         bed = Bed(width=300, num_slots=7, align=(Align.CENTER, Align.CENTER, Align.MIN))

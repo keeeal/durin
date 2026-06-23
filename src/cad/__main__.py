@@ -1,8 +1,9 @@
 from argparse import ArgumentParser
+from collections.abc import Callable
 from importlib import import_module
 from itertools import count
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from build123d import export_step, export_stl
 from build123d.topology.shape_core import Shape
@@ -31,7 +32,8 @@ def build_part(
     part_name: str,
 ) -> Shape:
     if part_name not in config:
-        raise ValueError(f"Unexpected part name: {part_name}")
+        msg = f"Unexpected part name: {part_name}"
+        raise ValueError(msg)
 
     part_config = config[part_name]
     part_class = import_class(part_config["class"])
@@ -56,7 +58,6 @@ def view(
             if not output_path.exists():
                 break
         save_screenshot(output_path.as_posix())
-        print(f"Saved screenshot to {output_path}")
 
 
 def export(
@@ -67,7 +68,8 @@ def export(
 ) -> None:
     format = format.lower()
     if format not in EXPORT_FUNCTIONS:
-        raise ValueError(f"Unexpected format: {format}")
+        msg = f"Unexpected format: {format}"
+        raise ValueError(msg)
 
     config = load_config(config_path)
     part_names = (
@@ -81,7 +83,6 @@ def export(
     )
     for part_name in part_names:
         output_path = output_dir / f"{part_name}.{format}"
-        print(f"Exporting {output_path}...")
         export_function = EXPORT_FUNCTIONS[format]
         part = build_part(config, part_name)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -106,7 +107,10 @@ if __name__ == "__main__":
     parser_export.set_defaults(function=export)
     parser_export.add_argument("--part-name", default=None)
     parser_export.add_argument(
-        "--format", type=str.lower, choices=EXPORT_FUNCTIONS, default="stl"
+        "--format",
+        type=str.lower,
+        choices=EXPORT_FUNCTIONS,
+        default="stl",
     )
     parser_export.add_argument("--output-dir", type=Path, default=Path() / "parts")
     args = vars(parser.parse_args())

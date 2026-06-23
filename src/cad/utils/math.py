@@ -1,5 +1,5 @@
+from collections.abc import Iterator
 from math import cos, radians, sin
-from typing import Iterator
 
 
 def polar_to_cartesian(

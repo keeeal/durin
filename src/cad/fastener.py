@@ -9,7 +9,7 @@ class SlidingTNut(BasePartObject):
         rotation: RotationLike = (0, 0, 0),
         align: Align | tuple[Align, Align, Align] | None = None,
         mode: Mode = Mode.ADD,
-    ):
+    ) -> None:
         with BuildPart() as main:
             with BuildSketch(Plane.YZ):
                 with BuildLine():

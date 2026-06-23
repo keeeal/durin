@@ -49,14 +49,16 @@ class SidePlate(BasePartObject):
                     + profile.vertices().group_by(Axis.X)[-1].group_by(Axis.Y)[-1],
                     length=2,
                 )
-                with Locations((20, 47.5)):
-                    with GridLocations(
+                with (
+                    Locations((20, 47.5)),
+                    GridLocations(
                         x_spacing=20,
                         y_spacing=37.5,
                         x_count=2,
                         y_count=3,
-                    ):
-                        Circle(2.75, mode=Mode.SUBTRACT)
+                    ),
+                ):
+                    Circle(2.75, mode=Mode.SUBTRACT)
                 with Locations(
                     (210, 98),
                     (133, 98),
@@ -80,13 +82,11 @@ class LeftPlate(BasePartObject):
     ) -> None:
         with BuildPart() as main:
             SidePlate(align=(Align.MIN, Align.MIN, Align.CENTER))
-            with BuildSketch():
-                with Locations((171, 71)):
-                    Circle(4.75)
+            with BuildSketch(), Locations((171, 71)):
+                Circle(4.75)
             extrude(until=Until.FIRST, mode=Mode.SUBTRACT)
-            with BuildSketch():
-                with Locations((171, 71)):
-                    Circle(8)
+            with BuildSketch(), Locations((171, 71)):
+                Circle(8)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
             chamfer(main.edges(Select.LAST).group_by(Axis.Z)[-1], length=0.5)
 
@@ -103,16 +103,15 @@ class RightPlate(BasePartObject):
     ) -> None:
         with BuildPart() as main:
             SidePlate()
-            with BuildSketch():
-                with Locations((171, 71)):
-                    Circle(12)
-                    with GridLocations(
-                        x_spacing=31,
-                        y_spacing=31,
-                        x_count=2,
-                        y_count=2,
-                    ):
-                        Circle(2)
+            with BuildSketch(), Locations((171, 71)):
+                Circle(12)
+                with GridLocations(
+                    x_spacing=31,
+                    y_spacing=31,
+                    x_count=2,
+                    y_count=2,
+                ):
+                    Circle(2)
             extrude(until=Until.LAST, mode=Mode.SUBTRACT)
             chamfer(main.edges(Select.LAST).group_by(Axis.Z)[-1], length=0.5)
 
@@ -127,7 +126,7 @@ class XAxisAssembly(Compound):
         color: Color | None = None,
         material: str = "",
         parent: Compound | None = None,
-    ):
+    ) -> None:
         children: list[Shape] = []
 
         left_plate = LeftPlate(align=Align.MIN).move(
@@ -172,7 +171,7 @@ class XAxisAssembly(Compound):
             Location((-200, 71, 176), (0, 90, 0)),
         )
         unset_color(bearing)
-        bearing.label = f"bearing"
+        bearing.label = "bearing"
         children.append(bearing)
 
         stepper_motor = StepperMotor("Nema17").move(
@@ -189,7 +188,8 @@ class XAxisAssembly(Compound):
         children.append(lead_screw)
 
         linear_rail = EG15LinearRail(
-            length=330, align=(Align.CENTER, Align.MIN, Align.CENTER)
+            length=330,
+            align=(Align.CENTER, Align.MIN, Align.CENTER),
         )
         linear_rails = [
             copy(linear_rail).move(Location((0, 61, 210), (0, 90, 180))),
